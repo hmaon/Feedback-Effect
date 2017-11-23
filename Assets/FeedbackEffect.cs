@@ -6,7 +6,6 @@ using UnityEngine.Rendering;
 public class FeedbackEffect : MonoBehaviour
 {
     const int TotalSlices = 10;
-    //public float DelaySeconds = 2;
 
     public float BoostThreshold = 1;
     public float UVMultiplier = 0.9f;
@@ -21,6 +20,7 @@ public class FeedbackEffect : MonoBehaviour
 
     private void Awake()
     {
+
         _cam = GetComponent<Camera>();
 
         try
@@ -33,9 +33,7 @@ public class FeedbackEffect : MonoBehaviour
             _mat = null;
             return;
         }
-        int rtid = Shader.PropertyToID("_CopyOfBuffer");
-        //sliceID = Shader.PropertyToID("_CurrentSliceIndex");
-        //prevSliceID = Shader.PropertyToID("_PrevSliceIndex");
+
         var format = _cam.allowHDR ? RenderTextureFormat.DefaultHDR : RenderTextureFormat.Default;
 
         _history = new RenderTexture(Screen.width / 4, Screen.height / 4, 0, format);
@@ -51,14 +49,6 @@ public class FeedbackEffect : MonoBehaviour
         _buf = new CommandBuffer();
         _buf.name = "Feedback Effect";
 
-        //_buf.GetTemporaryRT(rtid, -1, -1, 0, FilterMode.Bilinear, format);
-
-        //_buf.SetRenderTarget(rtid);
-        //_buf.ClearRenderTarget(true, true, Color.black);
-        //_buf.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
-
-        //_buf.CopyTexture(BuiltinRenderTextureType.CameraTarget, rtid); // XXX fails badly when MSAA is on
-
         _buf.Blit(_history, _history2, _mat);
         _buf.Blit(_history2, _history, _mat);
         _buf.Blit(_history, _history2, _mat);
@@ -66,12 +56,12 @@ public class FeedbackEffect : MonoBehaviour
 
         _buf.Blit(_history2, BuiltinRenderTextureType.CameraTarget, _mat);
 
-        //_buf.ReleaseTemporaryRT(rtid);
     }
 
     private void Update()
     {
         if (!_mat) return;
+
         _mat.SetFloat("_BoostThreshold", BoostThreshold);
         _mat.SetFloat("_UVMultiplier", UVMultiplier);
         _mat.SetFloat("_BlendAlpha", BlendAlpha);
